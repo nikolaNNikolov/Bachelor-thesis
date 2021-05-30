@@ -1,0 +1,1324 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>IC HMI</title>
+<script src="jquery-3.4.1.min.js"></script>
+</head>
+<style>
+	#cluster
+	{
+		position:absolute;
+		left:0%;
+		top:0%;
+	}
+	.element
+	{
+		visibility:hidden;
+		position:relative;
+		top: -30px; 
+		width:0px;
+		height:0px;
+		border:1px solid #000;
+	}
+	body
+	{
+	  overflow: hidden; 
+	  background: #000;
+	}
+</style>
+<body>
+    <canvas id="cluster">
+    	Instrumental Cluster Canvas.
+    </canvas>	
+	<!-- Loading all image elements -->
+	<!-- General -->
+	    <img id="BG" 				class="element" src="background/background_BG.png"						/>
+		<img id="FG" 				class="element" src="background/background_FG.png"						/>
+		<img id="shadow" 			class="element" src="background/background_Shadow.png"					/>
+		<img id="bridge" 			class="element" src="background/background_Bridge.png"					/>
+		<img id="brandLogo" 		class="element" src="background/background_Brand_Logo.png"				/>
+	<!-- Gauges Common -->
+	    <img id="gaugeRing" 		class="element" src="gauges/gauge_Ring.png"								/>
+		<img id="gaugeMidError" 	class="element" src="gauges/gauge_Mid_Error.png"						/>
+	<!-- Speedometer -->
+	    <img id="speedBG" 		class="element" src="speedo/speedo_BG.png"									/>
+	    <img id="speedNumKM" 	class="element" src="speedo/speedo_Scale.png"								/>
+	    <img id="speedMid" 		class="element" src="speedo/speedo_Mid.png"									/>
+		<img id="speedGlass" 	class="element" src="speedo/speedo_Glass.png"								/>
+    <!-- Tachometer -->
+	    <img id="tachoBG" 			class="element" src="tacho/tacho_BG.png"								/>
+	    <img id="tachoNumBen" 		class="element" src="tacho/tacho_Scale.png"								/>
+	    <img id="tachoMid" 			class="element" src="tacho/tacho_Mid.png"								/>
+	    <img id="speedGlassLeft" 	class="element" src="tacho/tacho_Glass.png"								/>
+    <!-- Odometer -->
+	    <img id="odometerKM" 		class="element" src="odometer/odometer_BG.png" 							/>
+		<img id="odometerGlass" 	class="element" src="odometer/odometer_Glass.png" 						/>
+		<img id="odometerText" 		class="element" src="odometer/odometer_Run_Total.png" 					/>
+	<!-- Inside and Outside Temperature -->
+	    <img id="outsideTemp" 		class="element" src="outsideInsideTemp/outsideInsideTemp_BG.png" 		/>
+	    <img id="insideTemp" 		class="element" src="outsideInsideTemp/outsideInsideTemp_BG.png" 		/>
+	    <img id="tempBGError" 		class="element" src="outsideInsideTemp/outsideInsideTemp_BG_Error.png" 	/>
+	    <img id="tempGlass" 		class="element" src="outsideInsideTemp/outsideInsideTemp_Glass.png" 	/>
+	    <img id="tempIcon" 			class="element" src="outsideInsideTemp/outsideTemp_Icon.png" 			/>
+	    <img id="tempIconError" 	class="element" src="outsideInsideTemp/outsideTemp_Icon_Error.png" 		/>
+	    <img id="tempInIcon" 		class="element" src="outsideInsideTemp/insideTemp_Icon.png" 			/>
+	    <img id="tempInIconError" 	class="element" src="outsideInsideTemp/insideTemp_Icon_Error.png" 		/>
+    <!-- Cooling Temperature -->
+	    <img id="coolingTempBG" 			class="element" src="coolingTemp/coolingTemp_BG.png" 			/>
+		<img id="coolingTempBGError" 		class="element" src="coolingTemp/coolingTemp_BG_Error.png" 		/>
+	    <img id="coolingTempBar" 			class="element" src="coolingTemp/coolingTemp_Fill.png" 			/>
+	    <img id="coolingTempIndic" 			class="element" src="coolingTemp/coolingTemp_Scale.png"			/>
+		<img id="coolingTempIndicError" 	class="element" src="coolingTemp/coolingTemp_Scale_Error.png" 	/>
+	    <img id="coolingTempIcon" 			class="element" src="coolingTemp/coolingTemp_Icon.png" 			/>
+	    <img id="coolingTempIconError" 		class="element" src="coolingTemp/coolingTemp_Icon_Error.png" 	/>
+		<img id="coolingTempGlass" 			class="element" src="coolingTemp/coolingTemp_Glass.png" 		/>
+	    <img id="coolingLevel" 				class="element" src="coolingTemp/coolingTemp_Level.png" 		/>
+	    <img id="coolingLevelCold" 			class="element" src="coolingTemp/coolingTemp_Level_Cold.png" 	/>
+	    <img id="coolingLevelHot" 			class="element" src="coolingTemp/coolingTemp_Level_Hot.png" 	/>
+	<!-- Fuel Bargraph -->
+		<img id="fuelBG" 			class="element" src="fuel/fuel_BG.png" 									/>
+	    <img id="fuelBGError" 		class="element" src="fuel/fuel_BG_Error.png" 							/>
+	    <img id="fuelBar" 			class="element" src="fuel/fuel_Fill.png" 								/>
+	    <img id="fuelIn" 			class="element" src="fuel/fuel_Scale.png" 								/>
+	    <img id="fuelInEmpty" 		class="element" src="fuel/fuel_Scale_Empty.png" 						/>
+	    <img id="fuelInFull" 		class="element" src="fuel/fuel_Scale_Full.png" 							/>
+	    <img id="fuelInError" 		class="element" src="fuel/fuel_Scale_Error.png" 						/>
+	    <img id="fuelIcon" 			class="element" src="fuel/fuel_Icon.png" 								/>
+	    <img id="fuelIconError" 	class="element" src="fuel/fuel_Icon_Error.png" 							/>
+	    <img id="fuelLevel" 		class="element" src="fuel/fuel_Level.png" 								/>
+	    <img id="fuelLevelError" 	class="element" src="fuel/fuel_Level_Error.png"							/>
+	<!-- RTT's -->
+	<!-- Left Blinker RTT -->
+	    <img id="leftTurn" 			class="element" src="rtt/rtt_Left_Turn.png" 							/>
+	    <img id="leftTurnEmpty" 	class="element" src="rtt/rtt_Left_Turn_Empty.png" 						/>
+	    <img id="leftTurnInactive" 	class="element" src="rtt/rtt_Left_Turn_Inactive.png" 					/>
+	<!-- Right Blinker RTT -->
+	    <img id="rightTurn" 			class="element" src="rtt/rtt_Right_Turn.png" 						/>
+	    <img id="rightTurnEmpty" 		class="element" src="rtt/rtt_Right_Turn_Empty.png" 					/>
+	    <img id="rightTurnInactive" 	class="element" src="rtt/rtt_Right_Turn_Inactive.png" 				/>
+    <!-- Oil Pressure RTT -->
+	    <img id="oilPressure" 			class="element" src="rtt/rtt_Oil_Pressure.png" 						/>
+	    <img id="oilPressureInactive" 	class="element" src="rtt/rtt_Oil_Pressure_Inactive.png" 			/>     
+	<!-- Battery Charge RTT -->
+	    <img id="batteryCharge" 			class="element" src="rtt/rtt_Battery_Charge.png" 				/>
+	    <img id="batteryChargeInactive" 	class="element" src="rtt/rtt_Battery_Charge_Inactive.png" 		/>
+	<!-- Hazard Lights RTT -->
+	    <img id="hazardLights" 			class="element" src="rtt/rtt_Hazard_Lights.png" 					/>
+	    <img id="hazardLightsInactive" 	class="element" src="rtt/rtt_Hazard_Lights_Inactive.png" 			/>
+    <!-- Handbrake RTT -->
+	    <img id="handbrakeWarning" 			class="element" src="rtt/rtt_Handbrake.png" 					/>
+	    <img id="handbrakeWarningInactive" 	class="element" src="rtt/rtt_Handbrake_Inactive.png" 			/>
+    <!-- Airbag RTT -->
+	    <img id="airbag" 			class="element" src="rtt/rtt_Airbag.png" 								/>
+	    <img id="airbagInactive" 	class="element" src="rtt/rtt_Airbag_Inactive.png" 						/>
+    <!-- Light Beams RTT -->
+	    <img id="highBeams" 		class="element" src="rtt/rtt_LightBeams_High.png" 						/>
+	    <img id="lowBeams" 			class="element" src="rtt/rtt_LightBeams_Low.png" 						/>
+	    <img id="parkingLights" 	class="element" src="rtt/rtt_LightBeams_Parking.png" 					/>
+	    <img id="inactiveLights" 	class="element" src="rtt/rtt_LightBeams_Inactive.png" 					/>
+	    <img id="errorLight" 		class="element" src="rtt/rtt_LightBeams_Error.png" 						/>
+    <!-- Door Open RTT -->
+	    <img id="openDoorInactive" 	class="element" src="rtt/rtt_OpenDoor_Inactive.png" 					/>
+	    <img id="openDoor1" 		class="element" src="rtt/rtt_OpenDoor_State_01.png" 					/>
+	    <img id="openDoor2" 		class="element" src="rtt/rtt_OpenDoor_State_02.png" 					/>
+	    <img id="openDoor3" 		class="element" src="rtt/rtt_OpenDoor_State_03.png" 					/>
+	    <img id="openDoor4" 		class="element" src="rtt/rtt_OpenDoor_State_04.png" 					/>
+	    <img id="openDoor5" 		class="element" src="rtt/rtt_OpenDoor_State_05.png" 					/>
+	    <img id="openDoor6" 		class="element" src="rtt/rtt_OpenDoor_State_06.png" 					/>
+	    <img id="openDoor7" 		class="element" src="rtt/rtt_OpenDoor_State_07.png" 					/>
+	    <img id="openDoor8" 		class="element" src="rtt/rtt_OpenDoor_State_08.png" 					/>
+	    <img id="openDoor9" 		class="element" src="rtt/rtt_OpenDoor_State_09.png" 					/>
+	    <img id="openDoor10" 		class="element" src="rtt/rtt_OpenDoor_State_10.png" 					/>
+	    <img id="openDoor11" 		class="element" src="rtt/rtt_OpenDoor_State_11.png" 					/>
+</body>
+
+<script type="text/javascript">
+//variables:
+	//Canvas variables 
+	var canvas = document.getElementById("cluster");
+	var ctx = canvas.getContext("2d");
+	var wRatio = 0.95;
+	var hRatio = 0.90;
+
+	//General Variables
+	var filterSmoothing = 100;
+	var lastUpdateSpeedo = new Date().getTime();
+	var lastUpdateTurnRight = new Date().getTime();
+	var lastUpdateTurnLeft = new Date().getTime();
+	var fontFam = 'Verdana';
+	var timeConst = 7.5;
+	var sleepConst = 500;
+
+	//Speedometer Variables
+	var tempoSpeedoValue = 0;
+	var tempoSleepVal = 0;
+	var curValueSpeed = 0;
+	var failsafeSpeed = 0;
+	var isValidSpeed = 0;
+	const spritesSpeedoArrow = [];
+
+	//Tachometer Variables
+	var tempoTachValue = 0;
+	var curValueTach = 0;
+	var failsafeTacho = 0;
+	var isValidTacho = 0;
+	const spritesTachoArrow = [];
+
+	//Gauges Variables
+	var speedArrow = document.createElement('img');
+	var tachArrow = document.createElement('img');
+
+	//Odometer Variables
+	var totalOdo = 0;
+	var curOdo = 123;
+	var failsafeOdo = 0;
+	var failOdo = 0;
+	var failOdoTot = 0;
+
+	//Cooling Tempreature Variables
+	var curCoolingTemp = 50;
+	var failsafeCoolingTemp = 50;
+	var coolingCoef = 0.3;
+	var isValidCool = 0;
+
+	//Fuel Variables
+	var curFuel = 0;
+	var isValidFuel = 0;
+
+	//Inside/Outside Temperature Variables
+	var tempUnit = 'C';
+
+	//RTT Variables
+	var isBlinkTurnOn = 0;
+	var sleepConstTurn = 1.25;
+
+	//Size Const Variables
+	var odoW, odoH, odoFont;
+	var gaigeW, gaigeFont;
+	var gearW, gearH, gearFont, gearFontNum;
+	var coolW, coolH;
+	var tempW, tempH, tempFont;
+	var w,h;
+
+	//Features Read From VIP Variables
+	var recieved, recievedStr;
+	var lostConnection = 1;
+	var readSpeed, readSpeedValidation, readTacho, readTachoValidation, readFuel, readOdo, readOdoTotal;
+	var readGear, readInsideTemp, readOutsideTemp, readCoolingTemp;
+	var readLeftTurn, readRightTurn, readLights, readOpenDoor;
+	var readAirbag, readBrake, readOil, readBattery;
+	var readHazard, curStyle = 0;
+	var readTime;
+//End of variables
+
+//Initialazation
+canvas.width = window.innerWidth * wRatio;
+canvas.height = window.innerHeight * hRatio;
+speedArrow.src = "style1/gauges/gauge_Arrow.png";
+tachArrow.src = "style1/gauges/gauge_Arrow.png";
+
+function resize()
+{
+	w = canvas.width = innerWidth; 
+	h = canvas.height = canvas.width*0.50401;
+}
+resize();
+
+window.addEventListener("resize",resize);
+window.addEventListener('load',function()
+{
+	calculateElements();
+	drawCanvasBasics();
+});
+
+/*General functions*/
+function update()
+{
+    var arrowHelper;
+
+	calculateElements();
+    if(lostConnection == 1){WebSocketTest();}
+	getInputs();
+
+	ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,w,h);
+	drawBG();
+
+	if(speedArrow.complete)
+	{
+      var iw = speedArrow.width;
+      var ih = speedArrow.height;
+	  var spr = spritesSpeedoArrow[0];
+	  var rot;
+
+	  rot = calcRotationKM(readSpeed);
+	  spr.r = rot *(Math.PI/180);
+	  spr.xr = (spr.x % arrowHelper) - iw * spr.scale;
+	  spr.yr = (spr.y % arrowHelper) - ih * spr.scale;
+	  drawArrowSpeedKM(speedArrow,spr);
+	  checkOdo(readOdo, readOdoTotal);
+	  displayOdometerKM(readOdo, readOdoTotal);
+    }
+
+    if(tachArrow.complete)
+    {
+	  var iw = tachArrow.width;
+      var ih = tachArrow.height;
+	  var spr = spritesTachoArrow[0];
+	  var rot;
+
+	  rot = calcRotationBen(readTacho);
+	  spr.r = rot *(Math.PI/180);
+	  spr.xr = (spr.x % arrowHelper) - iw * spr.scale;
+	  spr.yr = (spr.y % arrowHelper) - ih * spr.scale;
+	  drawArrowTachoBen(tachArrow,spr);
+	}
+
+	displayCoolingTemp(calcCoolingTemp(readCoolingTemp));
+	displayOutsideTempCelsius(readOutsideTemp);
+	displayInsideTempCelsius(readInsideTemp);
+    displayFuel(calcFuel(readFuel));
+    displayClock(readTime);
+    displayRTTs();
+    displayGear(readGear);
+	
+	drawOver();
+    requestAnimationFrame(update);
+}
+
+function calcVIP()
+{
+	//SPEEDOMETER_VALUE|SPEEDO_VALID|TACHOMETER_VALUE|TACHO_VALID|FUEL_LEVEL|ODO_RUN_VALUE|ODO_TOTAL_VALUE|
+	//GEAR_VALUE|INNER_TEMP_VALUE|OUTER_TEMP_VALUE|COOLING_TEMP_VALUE|
+	//LEFT_BLINKERS_VALUE|RIGHT_BLINKERS_VALUE|LIGHTS_VALUE|DOORS_VALUE|
+	//AIRBAG_VALUE|HANDBRAKE_ERROR_VALUE|ENGINE_OIL_ERROR_VALUE|BATTERY_CHARGE_ERROR_VALUE|
+	//HAZARD_LIGHTS_ERROR_VALUE|STYLE_VALUE|
+	
+	recievedStr = String(recieved);
+
+	var speed 			= getSubStr(recievedStr, '|'); //SPEEDOMETER_VALUE
+	var speedValid 		= getSubStr(recievedStr, '|'); //SPEEDO_VALID
+	var tacho 			= getSubStr(recievedStr, '|'); //TACHOMETER_VALUE
+	var tachoValid 		= getSubStr(recievedStr, '|'); //TACHO_VALID
+	var fuel 			= getSubStr(recievedStr, '|'); //FUEL_LEVEL
+	var tripOdo 		= getSubStr(recievedStr, '|'); //ODO_RUN_VALUE
+	var totalTripOdo 	= getSubStr(recievedStr, '|'); //ODO_TOTAL_VALUE
+	var gear 			= getSubStr(recievedStr, '|'); //GEAR_VALUE
+	var inTemp 			= getSubStr(recievedStr, '|'); //INNER_TEMP_VALUE
+	var outTemp 		= getSubStr(recievedStr, '|'); //OUTER_TEMP_VALUE
+	var coolTemp 		= getSubStr(recievedStr, '|'); //COOLING_TEMP_VALUE
+	var leftBlink 		= getSubStr(recievedStr, '|'); //LEFT_BLINKERS_VALUE
+	var rightBlink 		= getSubStr(recievedStr, '|'); //RIGHT_BLINKERS_VALUE
+	var lights 			= getSubStr(recievedStr, '|'); //LIGHTS_VALUE
+	var doors 			= getSubStr(recievedStr, '|'); //DOORS_VALUE
+	var airbag 			= getSubStr(recievedStr, '|'); //AIRBAG_VALUE
+	var handbrake 		= getSubStr(recievedStr, '|'); //HANDBRAKE_ERROR_VALUE
+	var engineOil 		= getSubStr(recievedStr, '|'); //ENGINE_OIL_ERROR_VALUE
+	var batteryCharge 	= getSubStr(recievedStr, '|'); //BATTERY_CHARGE_ERROR_VALUE
+	var hazardLight 	= getSubStr(recievedStr, '|'); //HAZARD_LIGHTS_ERROR_VALUE
+	var style 			= getSubStr(recievedStr, '|'); //STYLE_VALUE
+	
+	
+	readSpeed 			= speed*1; 					//SPEEDOMETER_VALUE
+	readSpeedValidation = speedValid * 1;			//SPEEDO_VALID
+	readTacho 			= tacho*1; 					//TACHOMETER_VALUE
+	readTachoValidation = tachoValid * 1; 			//TACHO_VALID
+	readFuel 			= fuel*1; 					//FUEL_LEVEL
+	readOdo 			= tripOdo*1; 				//ODO_RUN_VALUE
+	readOdoTotal 		= totalTripOdo*1; 			//ODO_TOTAL_VALUE
+	readGear 			= gear; 					//GEAR_VALUE
+	readInsideTemp 		= inTemp*1; 				//INNER_TEMP_VALUE
+	readOutsideTemp 	= outTemp*1; 				//OUTER_TEMP_VALUE
+	readCoolingTemp 	= coolTemp*1; 				//COOLING_TEMP_VALUE
+	readLeftTurn 		= leftBlink*1; 				//LEFT_BLINKERS_VALUE
+	readRightTurn 		= rightBlink*1; 			//RIGHT_BLINKERS_VALUE
+	readLights 			= lights*1; 				//LIGHTS_VALUE
+	readOpenDoor 		= doors*1; 					//DOORS_VALUE
+	readAirbag 			= airbag*1; 				//AIRBAG_VALUE
+	readBrake 			= handbrake*1; 				//HANDBRAKE_ERROR_VALUE
+	readOil 			= engineOil*1; 				//ENGINE_OIL_ERROR_VALUE
+	readBattery 		= batteryCharge*1; 			//BATTERY_CHARGE_ERROR_VALUE
+	readHazard 			= hazardLight*1; 			//HAZARD_LIGHTS_ERROR_VALUE
+	if((style*1 != curStyle) && (style*1 != "0")) 
+	{ styleChange();	}							//STYLE_VALUE		
+	readTime = new Date();
+}
+
+function getInputs()
+{
+	calcVIP();
+	if(!readSpeedValidation){failsafeSpeed = 0; isValidSpeed = 0; readSpeed = 'a';		}
+	if(!readTachoValidation){failsafeTacho = 0; isValidTacho = 0; readTacho = 'a';		}
+	if(!readTachoValidation){failsafeOdo = 0; 	readOdo = 'a';							}
+	if(!readTachoValidation){failsafeOdo = 0; 	readOdoTotal = 'a';						}
+	if(!readCoolingTemp){failsafeCoolingTemp = 50; isValidCool = 0; readCoolingTemp='a';}
+}
+
+function calculateElements()
+{
+	//Used these values to make sure
+	//all elements render OK on
+	//different sized screens
+	odoW 		= Math.round(0.1505*w);	
+	odoH 		= Math.round(0.1821*h);
+	odoFont 	= Math.round(0.0137*w);
+	gaigeFont 	= Math.round(0.034*w);
+	gaigeW 		= Math.round(0.3343*w);
+	gearW 		= Math.round(0.1337*w);
+	gearH 		= Math.round(0.1989*h);
+	gearFont 	= Math.round(0.0187*w);
+	gearFontNum = Math.round(0.0301*w);
+	coolW 		= Math.round(0.2173*w);
+	coolH 		= Math.round(0.0928*h);
+	tempW 		= Math.round(0.1706*w);
+	tempH 		= Math.round(0.0862*h);
+	tempFont 	= Math.round(0.0127*w)
+}
+
+function DO(count, callback)
+{ 
+	while (count--) 
+		{callback(count);}
+}
+
+function rand(min,max)
+{
+	return Math.random() * (max ?(max-min) : min) + (max ? min : 0)
+}
+
+/*WebSocket functions*/
+function WebSocketTest() 
+{
+	var recievedMessage;
+  	if ("WebSocket" in window) 
+  	{
+		var ws = new WebSocket("ws://localhost:8080");
+		ws.onerror = function() {  }
+		ws.onopen = function() { lostConnection = 0;};
+		ws.onmessage = function (evt) 
+		{ 
+			 var received_msg = evt.data;
+			 recievedMessage = evt.data;
+			 setRecieved(recievedMessage);
+		};
+		ws.onclose = function(){ lostConnection = 1;};
+	} else {}
+}
+
+function setRecieved(input)
+{
+	recieved = input; 
+}
+
+function getSubStr(str, delim) {
+	var a = str.indexOf(delim);
+	if (a == -1){return '';}
+	var b = str.indexOf(delim, a+1);
+	if (b == -1){return '';}
+	recievedStr = str.substring(b + 1);
+	return str.substr(a+1, b-a-1);
+}
+
+/*General Drawing functions*/
+function drawBG()
+{
+	var bg = document.getElementById("BG");
+	var bridge = document.getElementById("bridge");
+	var shadow = document.getElementById("shadow");
+	var brandLogo = document.getElementById("brandLogo");
+	
+	ctx.drawImage(bg, 0, 0, w, h);
+	ctx.drawImage(bridge, 0, 0, w, h);
+	ctx.drawImage(shadow, 0, 0, w, h);
+	ctx.drawImage(brandLogo, canvas.width*0.5-gaigeW*0.55, canvas.height*0.695, gaigeW, gaigeW*0.25);
+}
+
+function drawOver()
+{
+    if(curStyle == 1)
+    {
+    	var FG = document.getElementById("FG");
+        ctx.drawImage(FG, 0, 0, w, h);  
+    }	 
+}
+
+function drawCanvasBasics()
+{
+	var carImgDivs = document.getElementsByClassName('element');
+	for(var i = 0; i < carImgDivs.length; i++)
+	{
+    	var replacedSrc = carImgDivs[i].getAttribute('src');
+    	replacedSrc = 'style1/' + replacedSrc;
+    	carImgDivs[i].setAttribute("src", replacedSrc);
+	}
+	curStyle = 1;
+	requestAnimationFrame(update);
+
+	drawBG();
+	drawSpeedometer();
+	drawTachometer();
+}
+
+/*Speedometer functions*/
+function drawSpeedometer()
+{
+	var bg = document.getElementById("speedBG");
+	var num = document.getElementById("speedNum");
+	var mid = document.getElementById("speedMid");
+
+	ctx.drawImage(bg, canvas.width*0.20, canvas.height*0.10, gaigeW, gaigeW);
+	ctx.drawImage(num, canvas.width*0.20, canvas.height*0.10, gaigeW, gaigeW);
+	ctx.drawImage(mid, canvas.width*0.20, canvas.height*0.10, gaigeW, gaigeW);
+}
+
+function displaySpeed(degree)
+{
+    var unit = "km/h";
+    var posY; 
+    var color;
+
+    if(curStyle == 1)
+    {
+    	color = '#000';
+    	posY = canvas.height*0.10 +gaigeW*0.52;
+    }
+	else if(curStyle == 2)
+	{
+		color = '#FFF';
+		posY = canvas.height*0.10 +gaigeW*0.51;
+	}
+
+	ctx.fillStyle = color;
+	if(degree == "--"){	ctx.fillStyle = '#FFF'; unit = "--"}
+	ctx.textAlign = 'center'; 
+	ctx.font = "italic " + gaigeFont.toString()+"px "+fontFam;
+	ctx.fillText(degree,canvas.width*0.05 + gaigeW/2.05, posY);
+	ctx.font = "italic " +(gearFontNum*0.4).toString()+"px "+fontFam;
+	ctx.fillText(unit,canvas.width*0.05 + gaigeW/2.05, posY + gaigeW*0.05);
+}
+
+function drawArrowSpeedKM(image, spr)
+{
+	var bg = document.getElementById("speedBG");
+	var num = document.getElementById("speedNumKM");
+	var mid = document.getElementById("speedMid");
+	var ring = document.getElementById("gaugeRing");
+	var glass = document.getElementById("speedGlassLeft");
+    var posX = canvas.width*0.05;
+    var posY = canvas.height*0.10;
+	ctx.drawImage(bg, posX, posY, gaigeW, gaigeW);
+
+	//Rotate Arrow
+	ctx.save();
+	ctx.setTransform(spr.scale, 0, 1, 0, spr.xr, spr.yr);
+	ctx.translate(posX+ gaigeW/2 , posY+gaigeW*0.496);
+	ctx.rotate(spr.r);
+	ctx.drawImage(image, -gaigeW*0.065 / 2, 0, gaigeW*0.065, gaigeW*0.45);
+	ctx.restore();
+
+	ctx.drawImage(num, posX, posY, gaigeW, gaigeW);
+
+	if(isValidSpeed == 0)
+	{
+		mid = document.getElementById("gaugeMidError");
+		ctx.drawImage(mid, posX, posY, gaigeW, gaigeW);
+		displaySpeed("--");
+	}else
+	{
+		if(elapsedTimeSpeedo()==1)
+		{
+			ctx.drawImage(mid, posX, posY, gaigeW, gaigeW);
+			tempoSleepVal = tempoSpeedoValue;
+			displaySpeed(tempoSpeedoValue);
+		}else
+		{
+			ctx.drawImage(mid, posX, posY, gaigeW, gaigeW);
+			displaySpeed(tempoSleepVal);
+		}
+	}
+	ctx.drawImage(glass, canvas.width*0.05, canvas.height*0.10, gaigeW, gaigeW);
+}
+
+function filterSpeedo(targetVal)
+{
+	tempoSpeedoValue = targetVal;
+	var constSmooth = filterSmoothing / timeConst;
+	var filterVal = curValueSpeed + (targetVal - curValueSpeed) / constSmooth;
+	curValueSpeed = filterVal;
+	return filterVal;
+}
+
+function calcRotationKM(input)
+{
+	  if(isNaN(input))	{input = failsafeSpeed; isValidSpeed = 0;	}
+	  else 				{						isValidSpeed = 1;	}
+	  if(input > 260) 	{input = 0; 			isValidSpeed = 0;	}
+	  if(input < 0)		{input = 0; 			isValidSpeed = 0;	}
+
+	  var tempSpeed = filterSpeedo(input);
+	  var rotation;
+
+	  if(		tempSpeed >= 0 		&& tempSpeed < 50)	{ rotation = (tempSpeed/0.8425) + 25;	}
+	  else if(	tempSpeed >= 50 	&& tempSpeed < 100)	{ rotation = (tempSpeed/0.8325) + 25;	}
+	  else if(	tempSpeed >= 100 	&& tempSpeed < 140)	{ rotation = (tempSpeed/0.8425) + 25;   }
+	  else if(	tempSpeed >= 140 	&& tempSpeed < 170)	{ rotation = (tempSpeed/0.8425) + 25;	}
+	  else if(	tempSpeed >= 170 	&& tempSpeed < 220)	{ rotation = (tempSpeed/0.84) 	+ 25; 	}
+	  else if(	tempSpeed >= 220 	&& tempSpeed < 260)	{ rotation = (tempSpeed/0.8455) + 25;	}
+	  else if(	tempSpeed == 260)						{ rotation = 332;						}
+	  
+	  return rotation;
+}
+
+function elapsedTimeSpeedo()
+{
+	var now = new Date().getTime();
+	var elapsedTime = now - lastUpdateSpeedo;
+	if (elapsedTime > sleepConst)
+	{
+		lastUpdateSpeedo = now;
+		return 1;	
+	}
+	else { return 0; }
+}
+
+DO(1,()=>
+	{
+	    spritesSpeedoArrow.push(
+	    {
+	       x : rand(w), y : rand(h),
+	       xr : 0, yr : 0, 
+	       r : (Math.PI * 2),
+	       scale : 1,
+	       dr : 0.1,
+	    });
+	}
+);
+
+/*Tachometer functions*/
+function drawTachometer()
+{
+	var bg = document.getElementById("tachoBG");
+	var num = document.getElementById("tachoNumBen");
+	var mid = document.getElementById("tachoMid");
+	
+	ctx.drawImage(bg, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+	ctx.drawImage(num, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+	ctx.drawImage(mid, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+}
+
+function displayTacho(degree)
+{
+	ctx.fillStyle = '#000';
+	if(degree == "--"){	ctx.fillStyle = '#FFF';}
+	ctx.textAlign = 'center';
+	ctx.font = gaigeFont.toString()+"px "+fontFam;
+	ctx.fillText(degree,canvas.width*0.60 + gaigeW*0.49, canvas.height*0.10 +gaigeW*0.53);
+}
+
+function drawArrowTachoBen(image, spr)
+{
+	var bg = document.getElementById("tachoBG");
+	var num = document.getElementById("tachoNumBen");
+	var mid = document.getElementById("tachoMid");
+	ctx.drawImage(bg, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+	
+	//Rotate Arrow
+	ctx.save();
+	ctx.setTransform(spr.scale, 0, 1, 0, spr.xr, spr.yr);
+	ctx.translate(canvas.width*0.60+ gaigeW*0.5 , canvas.height*0.10+gaigeW*0.496);
+	ctx.rotate(spr.r);
+	ctx.drawImage(image, -gaigeW*0.065 / 2, 0, gaigeW*0.065, gaigeW*0.45);
+	ctx.restore();
+
+	ctx.drawImage(num, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+    
+    if(isValidTacho == 0)
+    {
+		mid = document.getElementById("gaugeMidError");
+		ctx.drawImage(mid, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+	}else
+	{
+		ctx.drawImage(mid, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+	}
+}
+
+function filterTacho(targetVal)
+{
+	tempoTachValue = targetVal;
+	var constSmooth = filterSmoothing / timeConst;
+	var filterVal = curValueTach + (targetVal - curValueTach) / constSmooth;
+	curValueTach = filterVal;
+	return filterVal;
+}
+
+function calcRotationBen(input)
+{
+	if(isNaN(input))	{input = failsafeTacho; isValidTacho = 0;	}
+	else 				{						isValidTacho = 1;	}
+	if(input > 7500) 	{input = 0; 			isValidTacho = 0;	}
+	if(input < 0) 		{input = 0; 			isValidTacho = 0;	}
+
+	input = input / 100;
+	var temp = filterTacho(input);
+	var rotation;
+
+	if 		(temp >= 0 		&& temp <= 10)	{ rotation =(temp*3.943) + 36;	}
+	else if (temp > 10 		&& temp <= 20)	{ rotation =(temp*3.873) + 34;	}
+	else if (temp > 20 		&& temp < 30)	{ rotation =(temp*3.893) + 34;	}
+	else if (temp >= 30 	&& temp < 39)	{ rotation =(temp*3.923) + 34;	}
+	else if (temp >= 39 	&& temp < 50)	{ rotation =(temp*3.853) + 34;	}
+	else if (temp >= 50 	&& temp < 60)	{ rotation =(temp*3.823) + 34;	}
+	else if (temp >= 60 	&& temp < 75)	{ rotation =(temp*3.813) + 34;	}
+	else if (temp >= 75)					{ rotation =(temp*3.873) + 34;	}
+	return rotation;
+}
+
+DO(1,()=>
+	{
+    	spritesTachoArrow.push(
+    	{
+	       	x : rand(w), y : rand(h),
+	       	xr : 0, yr : 0, // actual position of sprite
+	       	r : (Math.PI * 2),
+	       	scale : 1,
+	       	dr : 0.1,
+    	});
+	}
+);
+
+/*Odometer functions*/
+function displayOdometerKM(curOdo, totalOdo)
+{
+	var bg = document.getElementById("odometerKM");
+	var glass = document.getElementById("odometerGlass");
+	var run_total = document.getElementById("odometerText");
+
+	if(failOdo == 1)	{curOdo = "--";		}
+	if(failOdoTot == 1)	{totalOdo = "----";	}
+
+	ctx.drawImage(bg, canvas.width*0.395, canvas.height*0.2375, odoW, odoH);
+	ctx.fillStyle = '#FFF';
+	ctx.textAlign = 'right';
+    ctx.font = odoFont.toString()+"px "+fontFam;
+	ctx.fillText(curOdo,canvas.width*0.395 + odoW*0.62, canvas.height*0.2375 + odoH/2 - odoH/7.5);	
+	ctx.fillText(totalOdo,canvas.width*0.395 + odoW*0.62, canvas.height*0.2375 + odoH/2 + odoH/6);	
+	ctx.drawImage(glass, canvas.width*0.395, canvas.height*0.2375, odoW, odoH);
+	if(curStyle == 1)
+	{
+		ctx.drawImage(run_total, canvas.width*0.395, canvas.height*0.2375, odoW, odoH);
+	}
+}
+
+function checkOdo(run, total)
+{
+	failOdo = 0;
+	failOdoTot = 0;
+	curOdo = run;
+	totalOdo = total;
+	if((!curOdo) 	|| (isNaN(curOdo)))		{curOdo = failsafeOdo; 		failOdo = 1;	}
+	if(curOdo > 999999)						{curOdo = 999999;			failOdo = 1;	}
+	if(curOdo < 0)							{curOdo = 0;				failOdo = 1;	}
+	if((!totalOdo) 	|| (isNaN(totalOdo)))	{totalOdo = failsafeOdo; 	failOdoTot = 1;	}
+	if(totalOdo > 999999)					{totalOdo = 999999;			failOdoTot = 1;	}
+	if(totalOdo < 0) 						{totalOdo = 0;				failOdoTot = 1;	}
+
+	readOdo = curOdo;
+	readOdoTotal = totalOdo;
+}
+
+/*Outside/Inside Temperature functions*/
+function displayOutsideTempCelsius(input)
+{
+	var bg = document.getElementById("outsideTemp");
+	var glass = document.getElementById("tempGlass");
+    var icon = document.getElementById("tempIcon");
+	var color = '#FFF';
+
+	ctx.fillStyle = color; 
+	if(isNaN(input))
+	{
+		var invalidValue = '--';
+		ctx.fillStyle = color;
+		ctx.textAlign = 'right'; 
+    	ctx.font = (tempFont*1.2).toString()+"px "+fontFam;
+     	icon = document.getElementById("tempIconError");
+     	if(curStyle == 2)
+     	{
+        	bg = document.getElementById("tempBGError");
+        }
+		ctx.drawImage(bg, canvas.width*0.38, canvas.height*0.4075, tempW, tempH);
+        ctx.fillText(invalidValue ,canvas.width*0.38 + 0.5*tempW, canvas.height*0.4075 + 0.6323*tempH, 1.0784*tempW, 1.0769*tempH);
+	}else
+	{
+		var flag = 1;
+		if(input > 85)	{input = 85; 	flag = 0;}
+		if(input < -40)	{input = -40; 	flag = 0;}
+
+		input = (Math.round(input * 2) / 2).toFixed(1);
+		var displayValue = input.toString() + "°" + tempUnit;
+
+		ctx.textAlign = 'right'; 
+		ctx.font = tempFont.toString()+"px "+fontFam;
+
+		if(flag == 0)
+		{
+			displayValue = "--";
+			color = "#FFF"
+			ctx.font = (tempFont*1.2).toString()+"px "+fontFam;
+            icon = document.getElementById("tempIconError");
+            if(curStyle == 2)
+            {
+        		bg = document.getElementById("tempBGError");
+        	}
+		}
+		ctx.drawImage(bg, canvas.width*0.38, canvas.height*0.4075, tempW, tempH);
+		if(curStyle == 2)
+		{
+			if 		(input < -10 )									{color = "#91b1ff";}
+			else if (input >= -10 	&& input < 10)					{color = "#c1d3ff";	}
+			else if ((input >= 10 	&& input <= 25)||(flag == 0))	{color = "#FFF";	}
+	 		else if (input > 25 	&& input <= 35)					{color = "#ff8c8c";	}
+	 		else if (input > 35)									{color = "#ff3131";	}
+
+	 		ctx.fillStyle = color;
+			ctx.textAlign = 'right'; 
+		    ctx.font = "bold italic "+(tempFont*1).toString()+"px "+fontFam;
+		    ctx.shadowColor="black";
+			ctx.lineWidth=gearH*0.02;
+			ctx.strokeText(displayValue ,canvas.width*0.38 + 0.5*tempW, canvas.height*0.4075 + 0.6323*tempH, 1.0784*tempW, 1.0769*tempH);
+		}
+		ctx.fillText(displayValue ,canvas.width*0.38 + 0.5*tempW, canvas.height*0.4075 + 0.6323*tempH, 1.0784*tempW, 1.0769*tempH);
+	}
+	ctx.drawImage(glass, canvas.width*0.38, canvas.height*0.4075, tempW, tempH);
+	ctx.drawImage(icon, canvas.width*0.38, canvas.height*0.4075, tempW, tempH);
+}
+
+function displayInsideTempCelsius(input){
+	var bg = document.getElementById("outsideTemp");
+	var glass = document.getElementById("tempGlass");
+    var icon = document.getElementById("tempInIcon");
+	var color = '#FFF';
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = color;
+
+	if(isNaN(input))
+	{
+		var invalidValue = '--';
+    	ctx.font = (tempFont*1.2).toString()+"px "+fontFam;
+     	icon = document.getElementById("tempInIconError");
+		if(curStyle == 2)
+		{
+        	bg = document.getElementById("tempBGError");
+        }
+		ctx.drawImage(bg, canvas.width*0.38, canvas.height*0.485, tempW, tempH);
+		ctx.fillText(invalidValue ,canvas.width*0.38 + 0.5*tempW, canvas.height*0.485 + 0.6423*tempH, 1.0784*tempW, 1.0769*tempH);
+	}else
+	{
+		var flag = 1;
+		if(input > 85)	{input = 85; 	flag = 0;}
+		if(input < -40)	{input = -40; 	flag = 0;}
+
+		input = (Math.round(input * 2) / 2).toFixed(1);
+		var displayValue = input.toString() + "°" + tempUnit;
+		ctx.font = tempFont.toString()+"px "+fontFam;
+
+		if(flag == 0)
+		{
+			displayValue = "--";
+			ctx.font = (tempFont*1.2).toString()+"px "+fontFam;
+            icon = document.getElementById("tempInIconError");
+            if(curStyle == 2)
+            {
+            	bg = document.getElementById("tempBGError");
+            }
+		}
+		ctx.drawImage(bg, canvas.width*0.38, canvas.height*0.485, tempW, tempH);
+		if(curStyle == 2)
+		{
+			if 		(input < 10 )									{color = "#91b1ff";}
+			else if (input >= 10 	&& input < 18)					{color = "#c1d3ff";	}
+			else if ((input >= 18 	&& input <= 23)||(flag == 0))	{color = "#FFF";	}
+	 		else if (input > 23 	&& input <= 27)					{color = "#ff8c8c";	}
+	 		else if (input > 27)									{color = "#ff3131";	}
+
+	 		ctx.fillStyle = color;
+			ctx.textAlign = 'right'; 
+		    ctx.font = "bold italic "+(tempFont*1).toString()+"px "+fontFam;
+		    ctx.shadowColor="black";
+			ctx.lineWidth=gearH*0.02;
+			ctx.strokeText(displayValue ,canvas.width*0.38 + 0.5*tempW, canvas.height*0.485 + 0.6423*tempH, 1.0784*tempW, 1.0769*tempH);
+		}
+		ctx.fillText(displayValue ,canvas.width*0.38 + 0.5*tempW, canvas.height*0.485 + 0.6423*tempH, 1.0784*tempW, 1.0769*tempH);
+	}
+	ctx.drawImage(glass, canvas.width*0.38, canvas.height*0.485, tempW, tempH);
+	ctx.drawImage(icon, canvas.width*0.38, canvas.height*0.485, tempW, tempH);
+}
+
+/*Cooling Temperature functions*/
+function displayCoolingTemp(barT)
+{
+	var bg = document.getElementById("coolingTempBG");
+	var bar = document.getElementById("coolingTempBar");
+	var indic = document.getElementById("coolingTempIndic");
+    var icon = document.getElementById("coolingTempIcon");
+	var glass = document.getElementById("coolingTempGlass");
+	var curr = document.getElementById("coolingLevel");
+	var barW = Math.round(coolW*0.7385);
+	var bonCoef = Math.round(0.085*coolH);
+	var coef = 0;
+
+	if(isValidCool == 0)
+	{
+		bar = document.getElementById("coolingTempBGError");
+		indic = document.getElementById("coolingTempIndicError");
+        icon = document.getElementById("coolingTempIconError");
+	}
+
+	ctx.drawImage(bg, canvas.width*0.29 + 0.15*gaigeW, canvas.height*0.56, coolW, coolH);
+	ctx.drawImage(bar, canvas.width*0.29 + 0.15*gaigeW, canvas.height*0.56, coolW, coolH);
+
+	coef = (barT/130)*barW+bonCoef;
+
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.fillRect(canvas.width*0.29 + 0.15*gaigeW+0.1231*coolW, canvas.height*0.56+0.0369*coolW,coef,0.6714*coolH);
+	ctx.fillStyle = "rgba(0, 0, 0, 1)";
+	ctx.fillRect(canvas.width*0.29 + 0.15*gaigeW+0.0369*coolW+coef,canvas.height*0.56+0.0369*coolW,barW+bonCoef-coef,0.6714*coolH);
+	ctx.drawImage(indic, canvas.width*0.29 + 0.15*gaigeW, canvas.height*0.56, coolW, coolH);
+	
+	if(barT > 120)
+	{
+		icon = document.getElementById("coolingTempIconError");
+	}
+
+ 	if(curStyle == 2)
+ 	{
+ 		var color = "#FFF";
+ 		var unit = parseInt(barT) + "°C";
+
+ 		if 		(barT < 60 )				{color = "#91b1ff"; curr = document.getElementById("coolingLevelCold");	}
+ 		else if (barT >= 60 && barT < 80)	{color = "#c1d3ff";														}
+ 		else if (barT >= 80 && barT <= 100)	{color = "#FFF";														}
+ 		else if (barT > 100 && barT <= 120)	{color = "#ff8c8c";														}
+ 		else if (barT > 120)				{color = "#ff3131"; curr = document.getElementById("coolingLevelHot");	}
+
+ 		if(isValidCool == 0)
+ 		{
+ 			unit = " ";
+ 			curr = document.getElementById("fuelLevelError");
+ 		}
+
+ 		ctx.drawImage(curr, canvas.width*0.275 +coef, canvas.height*0.56, coolW, coolH);
+	    ctx.fillStyle = color;
+		ctx.textAlign = 'right'; 
+	    ctx.font = "bold italic "+(gearFontNum*0.45).toString()+"px "+fontFam;
+	    ctx.shadowColor="black";
+		ctx.lineWidth=gearH*0.02;
+		ctx.strokeText(unit, canvas.width*0.34 +coef, canvas.height*0.56 + coolH*0.7, gearW, gearH*0.46);
+	    ctx.fillText(unit, canvas.width*0.34 +coef, canvas.height*0.56 + coolH*0.7, gearW, gearH*0.46);
+	}
+
+    ctx.drawImage(icon, canvas.width*0.29 + 0.67*gaigeW, canvas.height*0.56 + coolH*0.26, coolH*0.7, coolH*0.7); 
+	ctx.drawImage(glass, canvas.width*0.29 + 0.15*gaigeW, canvas.height*0.56, coolW, coolH);
+}
+
+function filterTemp(targetVal)
+{
+	var constSmooth = filterSmoothing / timeConst;
+	var filterVal = curCoolingTemp + (targetVal - curCoolingTemp) / constSmooth;
+	curCoolingTemp = filterVal;
+	return filterVal;
+}
+
+function calcCoolingTemp(input)
+{
+	if(isNaN(input))	{input=failsafeCoolingTemp;	isValidCool = 0;}
+	else 				{							isValidCool = 1;}
+	if(input > 130)		{input = 50; 				isValidCool = 0;}
+	if(input < 50)		{input = 50; 				isValidCool = 0;}
+	var temp = filterTemp(input);
+	return temp;
+}
+
+/*Fuel functions*/
+function displayFuel(barT)
+{
+	var bg = document.getElementById("fuelBG");
+	var bar = document.getElementById("fuelBar");
+	var indic = document.getElementById("fuelIn");
+    var icon = document.getElementById("fuelIcon");
+	var glass = document.getElementById("coolingTempGlass");
+	var curr = document.getElementById("fuelLevel");
+	var bonCoef = Math.round(0.085*coolH);
+	var barW = Math.round(coolW*0.468);
+	var coef = 0;
+	var color = "#FFF";
+	
+	if(curStyle == 2)
+	{
+		if 		(barT <= 2)				{indic = document.getElementById("fuelIn"); curr = document.getElementById("fuelLevelError");}
+		else if (barT > 2 && barT < 98)	{indic = document.getElementById("fuelInEmpty");}
+		else if (barT >= 98)			{indic = document.getElementById("fuelInFull");}
+
+		if(isValidFuel == 0)
+		{
+        	curr = document.getElementById("fuelLevelError");
+		}
+	}
+	if(barT <= 10)
+	{
+		icon = document.getElementById("fuelIconError");
+	}
+	if(isValidFuel == 0)
+	{
+		bar = document.getElementById("fuelBGError");
+		indic = document.getElementById("fuelInError");
+        icon = document.getElementById("fuelIconError");
+	}
+    
+    ctx.fillStyle = color;
+	ctx.textAlign = 'left'; 
+    ctx.font = "italic "+(gearFontNum*0.4).toString()+"px "+fontFam;
+    ctx.fillText("E", canvas.width*0.6 + 0.35*gaigeW, canvas.height*0.642, gearW, gearH*0.46);
+    ctx.fillText("1/2", canvas.width*0.6 + 0.477*gaigeW, canvas.height*0.642, gearW, gearH*0.46);
+    ctx.fillText("F", canvas.width*0.6 + 0.65*gaigeW, canvas.height*0.642, gearW, gearH*0.46);
+	ctx.drawImage(bg, canvas.width*0.6 + 0.15*gaigeW, canvas.height*0.62, coolW, coolH);
+	ctx.drawImage(bar, canvas.width*0.6 + 0.15*gaigeW, canvas.height*0.62, coolW, coolH);
+ 
+	coef = (barT/100)*barW;
+    if(isValidFuel==0) {coef = 90;}
+	ctx.fillStyle = "rgba(255, 255, 255, 0)";
+	ctx.fillRect(canvas.width*0.6 + 0.28*gaigeW+0.1231*coolW, canvas.height*0.62+0.0769*coolW,coef,0.5414*coolH);
+	ctx.fillStyle = "rgba(0, 0, 0, " + isValidFuel+")";
+	ctx.fillRect(canvas.width*0.6 + 0.28*gaigeW + 0.1231*coolW+coef,canvas.height*0.62+0.0739*coolW,barW-coef,0.5214*coolH);
+	
+	ctx.drawImage(indic, canvas.width*0.6 + 0.15*gaigeW, canvas.height*0.62, coolW, coolH);
+    
+    if(curStyle == 2)
+    {
+		ctx.drawImage(curr, canvas.width*0.6 + 0.15*gaigeW +coef,canvas.height*0.62, coolW, coolH);
+	}
+    
+    ctx.drawImage(icon, canvas.width*0.6 + 0.38*gaigeW, canvas.height*0.62 - coolH*0.35, coolH*0.6, coolH*0.6); 
+}
+
+function filterFuel(targetVal)
+{
+	var constSmooth = filterSmoothing / timeConst;
+	var filterVal = curFuel + (targetVal - curFuel) / constSmooth;
+	curFuel = filterVal;
+	return filterVal;
+}
+
+function calcFuel(input)
+{
+	if(isNaN(input))	{input=failsafeCoolingTemp;	isValidFuel = 0;}
+	else 				{							isValidFuel = 1;}
+	if(input > 100)		{input = 50; 				isValidFuel = 0;}
+	if(input < 0)		{input = 50; 				isValidFuel = 0;}
+	var temp = filterFuel(input);
+	return temp;
+}
+
+/*Gear functions*/
+function displayGear(input)
+{
+	var color;
+	var style;
+    var gearType;
+    var autoGear = ['P','R','N','D','L','S'];
+	var glass = document.getElementById("speedGlass");
+
+    if(isValidTacho == 0)
+    {
+        color = '#FFF';
+    }else
+    {
+    	if 		(curStyle == 1){color = '#000'; style = 'bold ';	}
+		else if (curStyle == 2){color = '#FFF'; style = 'normal ';	}
+    }
+    
+	ctx.fillStyle = color;
+	ctx.textAlign = 'center'; 
+    ctx.font = style+gearFont.toString()+"px "+fontFam;
+    if (input === "") 
+    {
+        gearType = "--";
+        ctx.fillText("--", canvas.width*0.60 + gaigeW*0.5 - gearW/33, canvas.height*0.10 + gaigeW*0.496 + gearH*0.3, gearW+gearW*0.7272, gearH*0.46);
+        ctx.fillText("--" ,canvas.width*0.60 + gaigeW*0.5 - gearW/33, canvas.height*0.10 + gaigeW*0.496 - gearW/20, gearW+gearW*0.7272, gearH*0.46);
+    }else
+    {
+        if(isNaN(input))
+        {
+            var i;
+            var flag = 0;
+            gearType = "Auto";
+
+            for(i=0;i<=6;i++)
+            {
+                if(autoGear[i]==input)
+                {
+                    input = autoGear[i];
+                    flag = 1;
+                    break;	
+                }
+            }
+            if(flag!=1){input = "--";gearType = "--";}
+        }else
+        {
+            gearType = "Manual";
+
+            if 		(input < 0 || input > 7){input = "--"; gearType = "--";	}
+            if 		(input == 7)			{input = "R";					}
+            else if (input == 0)			{input = "N";					}
+        }
+        if(gearType == "--"){ctx.font = gearFontNum.toString()+"px "+fontFam;	}
+        else 				{ctx.font = style+gearFont.toString()+"px "+fontFam;}
+
+        ctx.fillText(gearType ,canvas.width*0.60 + gaigeW*0.5 - gearW/33, canvas.height*0.10 + gaigeW*0.496 - gearW/20, gearW+gearW*0.7272, gearH*0.46);
+        ctx.font = "italic "+gearFontNum.toString()+"px "+fontFam;
+        ctx.fillText(input, canvas.width*0.60 + gaigeW*0.5 - gearW/33, canvas.height*0.10 + gaigeW*0.496 + gearH*0.3, gearW+gearW*0.7272, gearH*0.46);    
+	}
+	ctx.drawImage(glass, canvas.width*0.60, canvas.height*0.10, gaigeW, gaigeW);
+}
+
+/*RTT's functions*/
+function displayRTTs()
+{
+    displayRTTLeftTurn(readLeftTurn);
+    displayRTTRightTurn(readRightTurn);
+    displayRTTLights(readLights);
+    displayRTTOil(readOil);
+    displayRTTBatery(readBattery);
+    displayRTTHandbrake(readBrake);
+    displayRTTHazardLight(readHazard);
+    displayRTTAirbag(readAirbag);
+    displayRTTOpenDoors(readOpenDoor);
+}
+
+function displayRTTLeftTurn(input)
+{
+    var arrow = document.getElementById("leftTurn");
+    var noArrow = document.getElementById("leftTurnEmpty");
+    var inactive = document.getElementById("leftTurnInactive");
+    var drawTrue = 0;
+    var now = new Date().getTime();
+
+    if(input == 0)
+    {
+     var timeDiff =  (now - lastUpdateTurnRight) / 1000;
+        if (timeDiff > sleepConstTurn)
+        {
+            lastUpdateTurnRight = now;
+            if(isBlinkTurnOn == 0){isBlinkTurnOn = 1; }
+            else if(isBlinkTurnOn == 1){isBlinkTurnOn = 0;}
+        }
+        if(isBlinkTurnOn == 0)
+        {
+            ctx.drawImage(arrow, canvas.width*0.36, canvas.height*0.23, coolW*0.15, coolH*0.8);
+        }else
+        {
+            ctx.drawImage(noArrow, canvas.width*0.36, canvas.height*0.23, coolW*0.15, coolH*0.8);
+        }
+   }else
+   {
+        ctx.drawImage(inactive, canvas.width*0.36, canvas.height*0.23, coolW*0.15, coolH*0.8);
+   }
+}
+
+function displayRTTRightTurn(input)
+{
+    var arrow = document.getElementById("rightTurn");
+    var noArrow = document.getElementById("rightTurnEmpty");
+    var inactive = document.getElementById("rightTurnInactive");
+    var drawTrue = 0;
+    var now = new Date().getTime();
+
+    if(input == 0)
+    {
+     var timeDiff =  (now - lastUpdateTurnRight) / 1000;
+        if (timeDiff > sleepConstTurn)
+        {
+            lastUpdateTurnRight = now;
+            if(isBlinkTurnOn == 0){isBlinkTurnOn = 1; }
+            else if(isBlinkTurnOn == 1){isBlinkTurnOn = 0;}
+        }
+        if(isBlinkTurnOn == 0)
+        {
+            ctx.drawImage(arrow, canvas.width*0.59, canvas.height*0.23, coolW*0.15, coolH*0.8);
+        }else
+        {
+            ctx.drawImage(noArrow, canvas.width*0.59, canvas.height*0.23, coolW*0.15, coolH*0.8);
+        }
+   }else
+   {
+        ctx.drawImage(inactive, canvas.width*0.59, canvas.height*0.23, coolW*0.15, coolH*0.8);
+   }
+}
+
+function displayRTTLights(input)
+{
+    var light = document.getElementById("inactiveLights");
+    switch(input) 
+    {
+        case 0:
+            light = document.getElementById("inactiveLights");
+            break;
+        case 1:
+           light = document.getElementById("highBeams");
+            break;
+        case 2:
+            light = document.getElementById("lowBeams");
+            break;
+        case 3:
+            light = document.getElementById("parkingLights");
+            break;
+      default:
+            light = document.getElementById("errorLight");
+            break;
+    }
+    ctx.drawImage(light, canvas.width*0.575, canvas.height*0.31, coolW*0.18, coolH*0.8);
+}
+
+function displayRTTOil(input)
+{
+    var oil = document.getElementById("oilPressure");
+    var inactive = document.getElementById("oilPressureInactive");
+    if(input == 0)
+    {
+        ctx.drawImage(oil, canvas.width*0.05 + gaigeW*0.45, canvas.height*0.59, coolW*0.15, coolH*0.8);
+    }else
+    {
+        ctx.drawImage(inactive,canvas.width*0.05 + gaigeW*0.45, canvas.height*0.59, coolW*0.15, coolH*0.8);
+    }
+}
+
+function displayRTTBatery(input)
+{
+    var battery = document.getElementById("batteryCharge");
+    var inactive = document.getElementById("batteryChargeInactive");
+    if(input == 0)
+    {
+        ctx.drawImage(battery, canvas.width*0.05 + gaigeW*0.45, canvas.height*0.66, coolW*0.15, coolH*0.8);
+    }else
+    {
+        ctx.drawImage(inactive,canvas.width*0.05 + gaigeW*0.45, canvas.height*0.66, coolW*0.15, coolH*0.8);
+    }
+}
+
+function displayRTTHandbrake(input)
+{
+    var battery = document.getElementById("handbrakeWarning");
+    var inactive = document.getElementById("handbrakeWarningInactive");
+    if(input == 0)
+    {
+        ctx.drawImage(battery, canvas.width*0.05 + gaigeW*0.45, canvas.height*0.54, coolW*0.15, coolH*0.8);
+    }else
+    {
+        ctx.drawImage(inactive,canvas.width*0.05 + gaigeW*0.45, canvas.height*0.54, coolW*0.15, coolH*0.8);
+    }
+}
+
+function displayRTTHazardLight(input)
+{
+    var hazardLight = document.getElementById("hazardLights");
+    var inactive = document.getElementById("hazardLightsInactive");
+    if(input == 0)
+    {
+        ctx.drawImage(hazardLight, canvas.width*0.495 + gaigeW*0.115, canvas.height*0.24, coolW*0.2, coolH*0.8);
+    }else
+    {
+        ctx.drawImage(inactive,canvas.width*0.495 + gaigeW*0.115, canvas.height*0.24, coolW*0.2, coolH*0.8);
+    }
+}
+
+function displayRTTAirbag(input)
+{
+    var airbag = document.getElementById("airbag");
+    var inactive = document.getElementById("airbagInactive");
+    if(input == 0)
+    {
+        ctx.drawImage(airbag, canvas.width*0.495 + gaigeW*0.125, canvas.height*0.31, coolW*0.18, coolH*0.8);
+    }else
+    {
+        ctx.drawImage(inactive,canvas.width*0.495 + gaigeW*0.125, canvas.height*0.31, coolW*0.18, coolH*0.8);
+    }
+}
+
+function displayRTTOpenDoors(input)
+{
+    var inactive = document.getElementById("openDoorInactive");
+    if(isNaN(input)){ input = 0;}
+    if(input > 0 && input <= 11)
+    {
+        var door = document.getElementById("openDoor" + input);
+        ctx.drawImage(door, canvas.width*0.495 + gaigeW*0.085, canvas.height*0.415, coolW*0.35, coolW*0.35);
+    }else
+    {
+        ctx.drawImage(inactive,canvas.width*0.495 + gaigeW*0.085, canvas.height*0.415, coolW*0.35, coolW*0.35);
+    }
+}
+
+/*Clock functions*/
+function displayClock(input)
+{
+    var color = "#FFF";
+    ctx.fillStyle = color;
+	ctx.textAlign = 'center'; 
+    ctx.font = "italic "+(gearFontNum*0.55).toString()+"px "+fontFam;
+    if (input === "") 
+    {
+        ctx.fillText("--:--", canvas.width*0.6 + 0.5*gaigeW, canvas.height*0.565, gearW, gearH*0.46);
+    }else
+    {
+        if(isNaN(input))
+        {
+            ctx.fillText("--:--", canvas.width*0.6 + 0.5*gaigeW, canvas.height*0.565, gearW, gearH*0.46);
+        }else
+        {
+            var minutes = input.getMinutes();
+            if(minutes < 10){minutes = "0"+minutes;}
+            var clock = input.getHours().toString() + ":" + minutes.toString();           
+            ctx.fillText(clock, canvas.width*0.6 + 0.5*gaigeW, canvas.height*0.565, gearW, gearH*0.46);        
+        }
+    }
+}
+
+/*Style functions*/
+function styleChange()
+{
+	var styleNum = 0;
+	if(curStyle == 1) 		//Switch to Style 2
+	{
+		speedArrow.src = "style2/gauges/gauge_Arrow.png";
+		tachArrow.src = "style2/gauges/gauge_Arrow.png";
+		fontFam = 'Courier';
+		styleNum = 2;
+	}else if(curStyle == 2) //Switch to Style 1
+	{
+		speedArrow.src = "style1/gauges/gauge_Arrow.png";
+		tachArrow.src = "style1/gauges/gauge_Arrow.png";
+		fontFam = 'Verdana';
+		styleNum = 1;
+	}else 					//default to Style 1
+	{
+        speedArrow.src = "style1/gauges/gauge_Arrow.png";
+        tachArrow.src = "style1/gauges/gauge_Arrow.png";
+        fontFam = 'Verdana';
+        styleNum = 1;
+    }
+	
+	var carImgDivs = document.getElementsByClassName('element');
+	for(var i = 0; i < carImgDivs.length; i++)
+	{
+		var newStyle = "style"+styleNum;
+    	var replacedSrc = carImgDivs[i].getAttribute('src');
+    	replacedSrc = replacedSrc.replace( /style\d/,newStyle);
+    	carImgDivs[i].setAttribute("src", replacedSrc);
+	}
+	curStyle = styleNum;
+}
+
+</script>
+</html>
