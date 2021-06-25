@@ -140,6 +140,8 @@
 	var ctx = canvas.getContext("2d");
 	var wRatio = 0.95;
 	var hRatio = 0.90;
+	var lastCalledFPS;
+	var fpsCounter = 0;
 
 	//General Variables
 	var filterSmoothing = 100;
@@ -284,6 +286,7 @@ function update()
     displayGear(readGear);
 	
 	drawOver();
+	calculateFPS();
     requestAnimationFrame(update);
 }
 
@@ -408,7 +411,7 @@ function WebSocketTest()
 
 function setRecieved(input)
 {
-	recieved = input; 
+	recieved = input;
 }
 
 function getSubStr(str, delim) {
@@ -1318,6 +1321,30 @@ function styleChange()
     	carImgDivs[i].setAttribute("src", replacedSrc);
 	}
 	curStyle = styleNum;
+}
+
+function calculateFPS()
+{
+	var fps;
+	if(!lastCalledFPS)
+	{
+		lastCalledFPS = new Date().getTime();
+		fps = 0;
+	}
+	var delta = (new Date().getTime() - lastCalledFPS)/1000;
+	lastCalledFPS = new Date().getTime();
+	fps = Math.ceil((1/delta));
+	
+	if(fpsCounter >= 60)
+	{
+		fpsCounter = 0;
+	}
+	else
+	{
+		if(fps !== Infinity)
+			console.log(fps);
+		fpsCounter++;
+	}
 }
 
 </script>
